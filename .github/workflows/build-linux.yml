@@ -1,0 +1,45 @@
+name: Build Linux Executable
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v0.1.0, v1.0.1, etc.
+
+permissions:
+  contents: write  # Needed to upload release assets
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r requirements.txt || true  # Or use pip install .[build]
+
+    - name: Build executable
+      run: |
+        pyinstaller --name=pip-uploader --onefile main.py
+        mkdir -p dist-upload
+        cp dist/pip-uploader dist-upload/
+        tar -czvf dist-upload/pip-uploader.tar.gz -C dist-upload pip-uploader
+
+    - name: Upload to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        files: |
+          dist-upload/pip-uploader.tar.gz
+          dist/pip-uploader
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
