@@ -13,7 +13,7 @@ from pathlib import Path
 class SSHFileUploader(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PIP Server Uploader")
+        self.setWindowTitle("PIP Library Uploader")
         self.setGeometry(100, 100, 600, 500)
         self.setWindowIcon(QIcon("icon.png"))
         self.selected_files = []
@@ -63,6 +63,13 @@ class SSHFileUploader(QMainWindow):
                 font-size: 14px;
                 color: #333;
             }
+            QLabel#titleLabel {
+                font-size: 24px;
+                font-weight: bold;
+                color: #007bff;
+                text-align: center;
+                padding: 10px;
+            }
             QListWidget {
                 border: 1px solid #ccc;
                 border-radius: 5px;
@@ -81,6 +88,13 @@ class SSHFileUploader(QMainWindow):
                 border-radius: 5px;
             }
         """)
+
+        # Title label
+        title_label = QLabel("PIP Library Uploader")
+        title_label.setObjectName("titleLabel")
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+        main_layout.addWidget(title_label)
 
         # Server connection inputs
         conn_frame = QFrame()
@@ -115,7 +129,7 @@ class SSHFileUploader(QMainWindow):
         conn_layout.addWidget(self.password_input, 2, 1)
 
         self.remote_path_input = QLineEdit()
-        self.remote_path_input.setText("/home/adminit/Downloads")  # Set default remote path
+        self.remote_path_input.setText("/home/adminit/Downloads")
         self.remote_path_input.setPlaceholderText("/home/adminit/Downloads")
         self.remote_path_input.setFont(font)
         conn_layout.addWidget(QLabel("Remote Path:"), 3, 0)
@@ -215,7 +229,7 @@ class SSHFileUploader(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setStyle("Fusion")  # Use Fusion style for a modern look
+    app.setStyle("Fusion")
     window = SSHFileUploader()
     window.show()
     sys.exit(app.exec())

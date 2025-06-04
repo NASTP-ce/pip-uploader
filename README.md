@@ -1,7 +1,3 @@
-Here is a professionally rewritten and structured version of your documentation:
-
----
-
 ## 📦 PIP Uploader – Project Setup and GitHub Release Guide
 
 ### 🔧 Project Setup
@@ -41,7 +37,7 @@ pyinstaller --onefile --windowed --icon=icon.png --name PIPLibraryUploader main.
 
 ```bash
 chmod +x dist/PIPLibraryUploader
-tar -czf PIPLibraryUploader-linux.tar.gz -C dist PIPLibraryUploader
+tar -czf dist/PIPLibraryUploader-linux.tar.gz -C dist PIPLibraryUploader
 ```
 
 ---
