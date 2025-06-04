@@ -30,7 +30,8 @@ build = ["pyinstaller"]
 Create a basic one using:
 
 ```bash
-pyinstaller --name=pip-uploader --onefile main.py
+pyinstaller --onefile --windowed --icon=icon.png --name PIPLibraryUploader main.py
+
 ```
 
 This generates:
