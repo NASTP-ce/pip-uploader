@@ -1,49 +1,50 @@
-name: Build Linux Executable
+name: Python application
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - 'v*'  # Also triggers on version tags like v1.0.0, v0.9.1, etc.
-  workflow_dispatch:  # Allows manual execution
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 permissions:
-  contents: write  # Required to upload release assets
+  contents: read
 
 jobs:
-  build-linux:
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout source code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
       with:
-        python-version: '3.12'
+        python-version: "3.12"
 
-    - name: Install dependencies
+    - name: Install uv
       run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller
-        pip install -r requirements.txt || true
+        wget -qO- https://astral.sh/uv/install.sh | sh
 
-    - name: Build executable
-      run: |
-        pyinstaller --name=pip-uploader --onefile main.py
-        mkdir -p dist-upload
-        cp dist/pip-uploader dist-upload/
-        tar -czvf dist-upload/pip-uploader.tar.gz -C dist-upload pip-uploader
-
-    - name: Upload to GitHub Release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
+    - name: PyInstaller Linux
+      # You may pin to the exact commit or the version.
+      # uses: JackMcKew/pyinstaller-action-linux@38639c352a36917eea765f9283bfd1092c28af7b
+      uses: JackMcKew/pyinstaller-action-linux@0.1.4
       with:
-        tag_name: ${{ github.ref_name }}
-        files: |
-          dist-upload/pip-uploader.tar.gz
-          dist/pip-uploader
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Directory containing source code & .spec file (optional requirements.txt).
+        path: ./
+          
+
+    - name: Install dependencies with uv
+      run: |
+        uv pip install -r pyproject.toml --system
+
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Test with pytest
+      run: |
+        pytest
